@@ -1,0 +1,7 @@
+all: clean qheap
+
+qheap: qheap.cpp
+	g++ -o qheap qheap.cpp
+
+clean:
+	rm qheap
