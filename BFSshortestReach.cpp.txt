@@ -1,0 +1,122 @@
+#include <cmath>
+#include <cstdio>
+#include <vector>
+#include <iostream>
+#include <algorithm>
+#include <list>
+using namespace std;
+
+
+class Graph {
+    private:
+    vector < vector<int> > matrix;    
+    public:
+        Graph(int n) {
+            //Create n x n matrix
+            matrix.resize(n);
+            for(int x = 0; x < n; x++){
+                for(int y = 0; y < n; y++){
+                    matrix[x].push_back(0);
+                }
+            }
+        }
+    
+        void add_edge(int u, int v) {
+            matrix[u][v] = 6; // edge weight is 6
+            matrix[v][u] = 6;
+        }
+    
+        /* parentID vector will keep track of distance using BFS technique
+        initially using -1 for all nodes except for start (which is 0)
+        once i have found all the parent ID for all nodes, i can 
+        loop again to get the distance needed by looping while not startNode
+        */
+        vector<int> shortest_reach(int start) {
+            vector<int> parentID(matrix.size(), -1);
+            parentID[start] = start; // starting point is 0;
+            // vector<int> queue;
+            std::list<int> queue;
+            queue.push_back(start);
+            
+            vector<int> distances(matrix.size(), -1);
+            
+            //using BFS
+            while(!queue.empty()){
+                int currentNode = queue.front();
+                queue.pop_front(); 
+                
+                for(int x = 0; x < matrix.size(); x ++){
+                    // if have not visit this node, and has an edge to it.
+                    if(parentID[x] == -1 && matrix[currentNode][x] > 0){
+                        queue.push_back(x);
+                        parentID[x] = currentNode; 
+                    }
+                }
+            }
+
+            for (int i = 0; i < parentID.size(); i++) {
+                if (i != start && parentID[i] != -1) {
+                    int currentParent = parentID[i];
+                    while(currentParent != start){
+                        currentParent = parentID[currentParent];
+                        distances[i] += 6;
+                    }
+                    distances[i] += 7; // because initially is -1
+                }
+            }
+        
+            return distances;
+        }
+        
+        void print_graph(){
+            cout << "- - - - " <<  endl  ;
+            for(int i = 0; i < matrix.size(); i++){
+                cout << i << "|";
+                for(int y = 0; y < matrix[0].size(); y++){
+                    cout  << matrix[i][y] << " ";
+                }
+                cout << endl;
+            }
+        }
+    
+};
+
+int main() {
+    int queries;
+    cin >> queries;
+        
+    for (int t = 0; t < queries; t++) {
+      
+      int n, m;
+        cin >> n;
+        // Create a graph of size n where each edge weight is 6: 
+        Graph graph(n);
+        cin >> m;
+        // read and set edges
+        for (int i = 0; i < m; i++) {
+            int u, v;
+            cin >> u >> v;
+            u--, v--;
+            // add each edge to the graph
+            graph.add_edge(u, v);
+        }
+        // graph.print_graph();
+        int startId;
+        cin >> startId;
+        startId--;
+        // graph.shortest_reach(startId);
+        
+        // Find shortest reach from node s
+        vector<int> distances = graph.shortest_reach(startId);
+
+        for (int i = 0; i < distances.size(); i++) {
+            if (i != startId) {
+                cout << distances[i] << " ";
+            }
+        }
+        cout << endl;
+        
+    }
+    
+    return 0;
+}
